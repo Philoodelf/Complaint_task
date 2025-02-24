@@ -1,9 +1,10 @@
 import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:report_task/complaint/wigets/mytextfield.dart';
 
 class Description extends StatefulWidget {
   final String title;
@@ -17,9 +18,17 @@ class Description extends StatefulWidget {
 }
 
 class _DescriptionState extends State<Description> {
+  final nameinputcontroller = TextEditingController();
+  final subjectcontoller = TextEditingController();
+  final emailcontoller = TextEditingController();
+  final numbercontoller = TextEditingController();
+
   FilePickerResult? result;
   bool showOptions = false;
+  bool showContact = false;
   String fileName = "No file selected";
+
+  Radiobuttons? _character = Radiobuttons.keep;
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +52,8 @@ class _DescriptionState extends State<Description> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelText: 'Description',
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 12),
                   ),
                   // minLines: 1, // Set this
                   maxLines: null, // and this
@@ -54,7 +63,9 @@ class _DescriptionState extends State<Description> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(right: 16, top: 8),
+              padding: const EdgeInsets.only(
+                right: 16,
+              ),
               child: Column(
                 children: [
                   Align(
@@ -76,7 +87,8 @@ class _DescriptionState extends State<Description> {
                       icon: const Icon(Icons.attach_file),
                     ),
                   ),
-                  Align(alignment: Alignment.centerRight, child: Text(fileName)),
+                  Align(
+                      alignment: Alignment.centerRight, child: Text(fileName)),
                 ],
               ),
             ),
@@ -84,22 +96,123 @@ class _DescriptionState extends State<Description> {
             // Align(
             //   alignment: Alignment.centerRight,
             //   child: Text(fileName)),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  showOptions = !showOptions; // Toggle visibility
-                });
-              },
-              child: Text(showOptions ? "Hide Options" : "Show Options"),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () {
+                  setState(() {
+                    showOptions = !showOptions; // Toggle visibility
+                  });
+                },
+                child: Text(showOptions ? "Hide Options" : "Show Options"),
+              ),
             ),
             const SizedBox(
               height: 10,
             ),
             Visibility(
               visible: showOptions,
-              child: const Column(
-                children: [Text(' options ')],
+              child: Column(
+                children: [
+                  Mytextfield(
+                    variable: 'Subject',
+                    controller: subjectcontoller,
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Category',
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: Colors.black),
+                        ),
+                        fillColor: const Color.fromARGB(150, 238, 238, 238),
+                        filled: true,
+                      ),
+                      items: <String>['A', 'B', 'C', 'D'].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (_) {},
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      RadioListTile<Radiobuttons>(
+                        title: const Text('Keep Anonymous'),
+                        value: Radiobuttons.keep,
+                        groupValue: _character,
+                        onChanged: (Radiobuttons? value) {
+                          setState(() {
+                            _character = value;
+                            showContact = false;
+                          });
+                        },
+                      ),
+                      RadioListTile<Radiobuttons>(
+                        title: const Text('Add Contact Information'),
+                        value: Radiobuttons.add,
+                        groupValue: _character,
+                        onChanged: (Radiobuttons? value) {
+                          setState(() {
+                            _character = value;
+                            showContact = !showContact;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
+            ),
+
+            //new visibility
+            Column(
+              children: [
+                Visibility(
+                  visible: showContact,
+                  child: Column(
+                    children: [
+                      //name
+                      Mytextfield(
+                        variable: 'Name',
+                        controller: nameinputcontroller,
+                        keyboardType: TextInputType.name,
+                      ),
+                      const SizedBox(height: 24),
+
+                      //email
+                      Mytextfield(
+                        variable: 'Email',
+                        controller: emailcontoller,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                      //mobile number
+                      Mytextfield(
+                        variable: 'Mobile Number',
+                        controller: numbercontoller,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(
+                        height: 24,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -107,3 +220,5 @@ class _DescriptionState extends State<Description> {
     );
   }
 }
+
+enum Radiobuttons { keep, add }
