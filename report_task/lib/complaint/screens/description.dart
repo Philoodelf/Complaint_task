@@ -299,30 +299,31 @@ class _DescriptionState extends State<Description> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 12,
-            ),
+            
 
-            ElevatedButton(
-              onPressed: () {
-                // Add your action here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue[500], // Light blue background
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32), // Rounded corners
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 30),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Add your action here
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlue[500], // Light blue background
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32), // Rounded corners
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 12, horizontal: 30), // Button padding
                 ),
-                padding: const EdgeInsets.symmetric(
-                    vertical: 12, horizontal: 20), // Button padding
+                child: const Text(
+                  'send',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white, // Text color
+                  ),
+                ).tr(),
               ),
-              child: const Text(
-                'send',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white, // Text color
-                ),
-              ).tr(),
             )
           ],
         ),
