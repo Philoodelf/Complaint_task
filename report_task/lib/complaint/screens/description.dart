@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:report_task/complaint/wigets/mytextfield.dart';
 
 class Description extends StatefulWidget {
@@ -26,7 +27,7 @@ class _DescriptionState extends State<Description> {
   FilePickerResult? result;
   bool showOptions = false;
   bool showContact = false;
-  String fileName = "No file selected";
+  String fileName = 'filename';
 
   Radiobuttons? _character = Radiobuttons.keep;
 
@@ -34,10 +35,29 @@ class _DescriptionState extends State<Description> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Submit a Complaint ',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          'appbarText'.tr(),
+          style: const TextStyle(color: Colors.black),
         ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Toggle between Arabic and English
+              if (context.locale == const Locale('en')) {
+                context.setLocale(const Locale('ar')); // Switch to Arabic
+              } else {
+                context.setLocale(const Locale('en')); // Switch to English
+              }
+            },
+            child: Text(
+              context.locale == const Locale('en')
+                  ? '🇪🇬 عربي'
+                  : '🇬🇧 English',
+              style: const TextStyle(
+                  color: Color.fromARGB(255, 43, 20, 255), fontSize: 16),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -51,7 +71,7 @@ class _DescriptionState extends State<Description> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    labelText: 'Description',
+                    labelText: 'Description'.tr(),
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 20, horizontal: 12),
                   ),
@@ -59,6 +79,8 @@ class _DescriptionState extends State<Description> {
                   maxLines: null, // and this
                   expands: true,
                   keyboardType: TextInputType.multiline,
+                  //textAlign: TextAlign.right, 
+                  textAlignVertical: TextAlignVertical.top,
                 ),
               ),
             ),
@@ -88,7 +110,7 @@ class _DescriptionState extends State<Description> {
                     ),
                   ),
                   Align(
-                      alignment: Alignment.centerRight, child: Text(fileName)),
+                      alignment: Alignment.centerRight, child: Text(fileName).tr()),
                 ],
               ),
             ),
@@ -104,7 +126,8 @@ class _DescriptionState extends State<Description> {
                     showOptions = !showOptions; // Toggle visibility
                   });
                 },
-                child: Text(showOptions ? "Hide Options" : "Show Options"),
+                child:
+                    Text(showOptions ? 'hideOption'.tr() : 'showOption'.tr()),
               ),
             ),
             const SizedBox(
@@ -115,7 +138,7 @@ class _DescriptionState extends State<Description> {
               child: Column(
                 children: [
                   Mytextfield(
-                    variable: 'Subject',
+                    variable: 'subject'.tr(),
                     controller: subjectcontoller,
                   ),
                   const SizedBox(
@@ -125,7 +148,7 @@ class _DescriptionState extends State<Description> {
                     padding: const EdgeInsets.symmetric(horizontal: 25),
                     child: DropdownButtonFormField<String>(
                       decoration: InputDecoration(
-                        labelText: 'Category',
+                        labelText: 'Category'.tr(),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(color: Colors.black),
@@ -149,7 +172,7 @@ class _DescriptionState extends State<Description> {
                   Column(
                     children: [
                       RadioListTile<Radiobuttons>(
-                        title: const Text('Keep Anonymous'),
+                        title: const Text('keep').tr(),
                         value: Radiobuttons.keep,
                         groupValue: _character,
                         onChanged: (Radiobuttons? value) {
@@ -160,7 +183,7 @@ class _DescriptionState extends State<Description> {
                         },
                       ),
                       RadioListTile<Radiobuttons>(
-                        title: const Text('Add Contact Information'),
+                        title: const Text('add').tr(),
                         value: Radiobuttons.add,
                         groupValue: _character,
                         onChanged: (Radiobuttons? value) {
@@ -185,7 +208,7 @@ class _DescriptionState extends State<Description> {
                     children: [
                       //name
                       Mytextfield(
-                        variable: 'Name',
+                        variable: 'name'.tr(),
                         controller: nameinputcontroller,
                         keyboardType: TextInputType.name,
                       ),
@@ -193,7 +216,7 @@ class _DescriptionState extends State<Description> {
 
                       //email
                       Mytextfield(
-                        variable: 'Email',
+                        variable: 'email'.tr(),
                         controller: emailcontoller,
                         keyboardType: TextInputType.emailAddress,
                       ),
@@ -202,18 +225,105 @@ class _DescriptionState extends State<Description> {
                       ),
                       //mobile number
                       Mytextfield(
-                        variable: 'Mobile Number',
+                        variable: 'mobile'.tr(),
                         controller: numbercontoller,
                         keyboardType: TextInputType.phone,
                       ),
                       const SizedBox(
                         height: 24,
                       ),
+
+                      //textnote
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                Colors.lightBlue[100], // Light blue background
+                            borderRadius:
+                                BorderRadius.circular(15), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start, // Aligns text properly
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment
+                                    .start, // Aligns text at the top
+                                children: [
+                                  Icon(Icons.notes_rounded,
+                                      color: Colors.lightBlue[700],
+                                      size: 24), // Darker blue icon
+                                  const SizedBox(
+                                      width: 10), // Space between icon and text
+                                  Expanded(
+                                    // Makes text wrap inside the Row
+                                    child: Text(
+                                      'noteText'.tr(), // Translatable text
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.shield,
+                                      color: Colors.lightBlue[700],
+                                      size: 24), // Darker blue icon
+                                  const SizedBox(
+                                      width: 10), // Space between icon and text
+                                  Expanded(
+                                    child: Text(
+                                      'ProtectText'.tr(), // Translatable text
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
               ],
             ),
+            const SizedBox(
+              height: 12,
+            ),
+
+            ElevatedButton(
+              onPressed: () {
+                // Add your action here
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue[500], // Light blue background
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32), // Rounded corners
+                ),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 12, horizontal: 20), // Button padding
+              ),
+              child: const Text(
+                'send',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white, // Text color
+                ),
+              ).tr(),
+            )
           ],
         ),
       ),
