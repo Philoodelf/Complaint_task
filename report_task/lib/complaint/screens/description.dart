@@ -3,9 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:report_task/complaint/wigets/mytextfield.dart';
+import 'package:report_task/cubit/usercubit.dart';
 
 class Description extends StatefulWidget {
   final String title;
@@ -28,6 +30,7 @@ class _DescriptionState extends State<Description> {
   bool showOptions = false;
   bool showContact = false;
   String fileName = 'filename';
+  String ?selectedCategory;
 
   Radiobuttons? _character = Radiobuttons.keep;
 
@@ -79,7 +82,7 @@ class _DescriptionState extends State<Description> {
                   maxLines: null, // and this
                   expands: true,
                   keyboardType: TextInputType.multiline,
-                  //textAlign: TextAlign.right, 
+                  //textAlign: TextAlign.right,
                   textAlignVertical: TextAlignVertical.top,
                 ),
               ),
@@ -110,7 +113,8 @@ class _DescriptionState extends State<Description> {
                     ),
                   ),
                   Align(
-                      alignment: Alignment.centerRight, child: Text(fileName).tr()),
+                      alignment: Alignment.centerRight,
+                      child: Text(fileName).tr()),
                 ],
               ),
             ),
@@ -166,7 +170,11 @@ class _DescriptionState extends State<Description> {
                           child: Text(value),
                         );
                       }).toList(),
-                      onChanged: (_) {},
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory=value;
+                        });
+                      },
                     ),
                   ),
                   Column(
@@ -229,9 +237,7 @@ class _DescriptionState extends State<Description> {
                         controller: numbercontoller,
                         keyboardType: TextInputType.phone,
                       ),
-                      const SizedBox(
-                        height: 24,
-                      ),
+                      const SizedBox(height: 24),
 
                       //textnote
                       Padding(
@@ -299,16 +305,18 @@ class _DescriptionState extends State<Description> {
                 ),
               ],
             ),
-            
 
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 30),
               child: ElevatedButton(
                 onPressed: () {
+
+                  context.read<UserCubit>().postIt(result, selectedCategory);
                   // Add your action here
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlue[500], // Light blue background
+                  backgroundColor:
+                      Colors.lightBlue[500], // Light blue background
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(32), // Rounded corners
                   ),

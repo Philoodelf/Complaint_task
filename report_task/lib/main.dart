@@ -1,8 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:report_task/core/api/api_consumer.dart';
+import 'package:report_task/core/api/dio_consumer.dart';
 import 'complaint/screens/description.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'cubit/usercubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,7 +16,10 @@ void main() async {
     supportedLocales: const [Locale('en'), Locale('ar')],
     path: 'assets/lang',
     fallbackLocale: const Locale('en'),
-    child: const MyApp(),
+    child: BlocProvider(
+      create: (context) => UserCubit(DioConsumer(dio: Dio()) as ApiConsumer),
+      child: const MyApp(),
+    ),
   ));
 }
 
