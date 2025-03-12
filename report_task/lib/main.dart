@@ -16,8 +16,13 @@ void main() async {
     supportedLocales: const [Locale('en'), Locale('ar')],
     path: 'assets/lang',
     fallbackLocale: const Locale('en'),
-    child: BlocProvider(
-      create: (context) => UserCubit(DioConsumer(dio: Dio()) as ApiConsumer),
+    child: MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              UserCubit(DioConsumer(dio: Dio()) as ApiConsumer),
+        ),
+      ],
       child: const MyApp(),
     ),
   ));

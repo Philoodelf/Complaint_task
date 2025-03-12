@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:report_task/complaint/wigets/mytextfield.dart';
+import 'package:report_task/core/api/api_consumer.dart';
+import 'package:report_task/core/api/dio_consumer.dart';
 import 'package:report_task/cubit/usercubit.dart';
+import 'package:report_task/cubit/userstate.dart';
 
 class Description extends StatefulWidget {
   final String title;
@@ -30,7 +34,7 @@ class _DescriptionState extends State<Description> {
   bool showOptions = false;
   bool showContact = false;
   String fileName = 'filename';
-  String ?selectedCategory;
+  String? selectedCategory;
 
   Radiobuttons? _character = Radiobuttons.keep;
 
@@ -172,7 +176,7 @@ class _DescriptionState extends State<Description> {
                       }).toList(),
                       onChanged: (value) {
                         setState(() {
-                          selectedCategory=value;
+                          selectedCategory = value;
                         });
                       },
                     ),
@@ -308,31 +312,62 @@ class _DescriptionState extends State<Description> {
 
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 30),
-              child: ElevatedButton(
-                onPressed: () {
-
-                  context.read<UserCubit>().postIt(result, selectedCategory);
-                  // Add your action here
+              child: BlocConsumer<UserCubit, UserState>(
+                listener: (context, state) {
+                  if (state is SendSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("success"),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } else if (state is SendFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("failed"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.lightBlue[500], // Light blue background
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32), // Rounded corners
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 12, horizontal: 30), // Button padding
-                ),
-                child: const Text(
-                  'send',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white, // Text color
-                  ),
-                ).tr(),
+                builder: (context, state) {
+                  return state is PostLoading
+                      ? LoadingAnimationWidget.hexagonDots(
+                          color: Colors.lightBlue, size: 50)
+                      : ElevatedButton(
+                          onPressed: () {
+                            context
+                                .read<UserCubit>()
+                                .postIt(result, selectedCategory);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightBlue[500],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 30),
+                          ),
+                          //              child: AnimatedSwitcher( // ✅ Ensure UI updates when state changes
+                          // duration: const Duration(milliseconds: 300),
+                          // child: state is PostLoading
+                          //     ? LoadingAnimationWidget.hexagonDots(
+                          //         color: Colors.white,
+                          //         size: 50,
+                          //       )
+                          //     :
+                          child: const Text(
+                            'Send',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ).tr(),
+                        );
+                },
               ),
-            )
+            ),
           ],
         ),
       ),
