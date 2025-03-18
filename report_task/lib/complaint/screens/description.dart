@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:report_task/complaint/screens/result_screen.dart';
 import 'package:report_task/complaint/wigets/mytextfield.dart';
 import 'package:report_task/core/api/api_consumer.dart';
 import 'package:report_task/core/api/dio_consumer.dart';
@@ -25,6 +26,12 @@ class Description extends StatefulWidget {
 }
 
 class _DescriptionState extends State<Description> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<UserCubit>().fetchCategories();
+  }
+
   final nameinputcontroller = TextEditingController();
   final subjectcontoller = TextEditingController();
   final emailcontoller = TextEditingController();
@@ -154,31 +161,52 @@ class _DescriptionState extends State<Description> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Category'.tr(),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Colors.black),
+                    child: Column(
+                      children: [
+                        BlocBuilder<UserCubit, UserState>(
+                          builder: (context, state) {
+                            if (state is PostLoading) {
+                              return const CircularProgressIndicator(); // ✅ Show loading while fetching data
+                            }
+
+                            List<Map<String, dynamic>> categories =
+                                context.read<UserCubit>().categories;
+
+                            return DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                labelText: 'Category'.tr(),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black),
+                                ),
+                                fillColor:
+                                    const Color.fromARGB(150, 238, 238, 238),
+                                filled: true,
+                              ),
+                              items: categories.map((category) {
+                                return DropdownMenuItem<String>(
+                                  value: category["id"]
+                                      .toString(), // ✅ Use category ID as value
+                                  child: Text(category["name"]
+                                      .toString()), // ✅ Show category name
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedCategory =
+                                      value; // ✅ Store selected category ID
+                                });
+                              },
+                            );
+                          },
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Colors.black),
-                        ),
-                        fillColor: const Color.fromARGB(150, 238, 238, 238),
-                        filled: true,
-                      ),
-                      items: <String>['A', 'B', 'C', 'D'].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedCategory = value;
-                        });
-                      },
+                      ],
                     ),
                   ),
                   Column(
@@ -313,8 +341,14 @@ class _DescriptionState extends State<Description> {
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 30),
               child: BlocConsumer<UserCubit, UserState>(
-                listener: (context, state) {
+                listener: (context, state) async {
                   if (state is SendSuccess) {
+                    await Future.delayed(
+                        const Duration(seconds: 2)); // ✅ Wait before navigating
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const ResultScreen()),
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("success"),
@@ -339,6 +373,8 @@ class _DescriptionState extends State<Description> {
                             context
                                 .read<UserCubit>()
                                 .postIt(result, selectedCategory);
+                            // Navigator.of(context).push(MaterialPageRoute(
+                            //     builder: (context) => const ResultScreen()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.lightBlue[500],
@@ -357,7 +393,7 @@ class _DescriptionState extends State<Description> {
                           //       )
                           //     :
                           child: const Text(
-                            'Send',
+                            'send',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,

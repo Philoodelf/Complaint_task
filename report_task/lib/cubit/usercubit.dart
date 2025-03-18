@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:report_task/core/api/api_consumer.dart';
@@ -12,6 +13,8 @@ import 'package:report_task/cubit/userstate.dart';
 class UserCubit extends Cubit<UserState> {
   UserCubit(this.api) : super(UserInitial());
   final ApiConsumer api;
+
+  List<Map<String, dynamic>> categories = [];
 
   GlobalKey<FormState> sendItFormKey = GlobalKey();
 
@@ -32,6 +35,8 @@ class UserCubit extends Cubit<UserState> {
         file = File(result!.files.single.path!); // Get the picked file
         fileName = result!.files.single.name; // Get file name
       }
+
+      String currentDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
         //api.post(EndPoints.postComplaint,
         FormData formData = FormData.fromMap({
           ApiKeys.description: descriptionController.text,
@@ -39,6 +44,7 @@ class UserCubit extends Cubit<UserState> {
           ApiKeys.name: nameinputcontroller.text,
           ApiKeys.email: emailcontoller.text,
           ApiKeys.phone: numbercontoller.text,
+          ApiKeys.date: currentDate,
        if (fileName.isNotEmpty)   ApiKeys.file: await MultipartFile.fromFile(file.path,filename: fileName), // ✅ File upload
           ApiKeys.category:selectedCategory, // ✅ Ensure you have a selectedCategory variable
         });
@@ -58,27 +64,24 @@ class UserCubit extends Cubit<UserState> {
       //emit(SendFailure(errMessage: ));
     }
 
-    // api.post(EndPoints.postComplaint, data: {
-    //   ApiKeys.description: descriptionController.text,
-    //   ApiKeys.subject: subjectcontoller.text,
-    //   ApiKeys.name: nameinputcontroller.text,
-    //   ApiKeys.email: emailcontoller.text,
-    //   ApiKeys.phone: numbercontoller.text,
-    //   ApiKeys.file: fileController.,
-    //   ApiKeys.category: categoryController.selection
-    // });
-    // try{
-    // final response = await api.post(
-
-    // );
-    // emit(SendSuccess());
-    // print(response);
-
-    // }catch(e){
-    //   emit(SendFailure(errMessage: e.toString()));
-    //   print(e.toString());
-
-    // }
+    
   }
-  //);
+  Future<void> fetchCategories() async {
+    try {
+      emit(PostLoading()); // ✅ Show loading
+
+      var response = await api.get(EndPoints.categoryComplaint); // ✅ Replace with your endpoint
+
+      if (response != null && response["result"] == true) {
+        categories = List<Map<String, dynamic>>.from(response["data"]); // ✅ Store categories
+        emit(CategoriesLoaded(categories)); // ✅ Emit categories
+      } else {
+        emit(SendFailure(errMessage: "Failed to load categories"));
+      }
+    } catch (e) {
+      emit(SendFailure(errMessage: "Error: $e"));
+    }
+  }
+
+  
 }

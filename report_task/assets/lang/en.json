@@ -13,5 +13,8 @@
     "mobile":"Mobile Number",
     "noteText":"All fields are optional, but you must fill out at least one field in order to proceed.",
     "ProtectText":"All entered fields are not received, only for the specific persons considered with the Complaints. ",
-    "send":"Send"
+    "send":"Send",
+    "New Complaint":"New Complaint",
+    "Submit Successfully":"Submit Successfully",
+    "Exit":"Exit"
 }

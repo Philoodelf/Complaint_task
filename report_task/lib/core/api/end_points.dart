@@ -1,6 +1,7 @@
 class EndPoints {
   static String baseUrl = "https://clericalapi.garassolutions.com";
   static String postComplaint="/api/complaint/AddAndUpdatecomplaint";
+  static String categoryComplaint="/api/complaint/GetAllCatagorycomplaint";
 }
 
 class ApiKeys{
@@ -22,5 +23,6 @@ class ApiKeys{
 
   // Other
   static String send = "send"; // Button action
+  static String date= "date";
 }
 
